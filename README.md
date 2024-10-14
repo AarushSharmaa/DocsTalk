@@ -2,6 +2,16 @@
 ## Overview
 DocsTalk is an innovative application that allows you to converse with your documents using Large Language Models (LLMs). With DocsTalk, you can easily extract insights, answer questions, and interact with content from various file formats such as PDFs, PPTs, text documents and more.
 
+
+
+## Table of Contents
+
+- Introduction
+- Features
+- Tech Stack (Backend, Frontend, Data Processing)
+- Setting up the project in your system
+- Usage
+
 ### Introduction
 Welcome to DocsTalk! We often find ourselves overwhelmed with information contained in PDFs, PowerPoint presentations, text documents, and more. Traditional methods of studying and synthesizing this content can be time-consuming and inefficient. DocsTalk aims to change that by leveraging the power of LLMs, making it easy to interact with your documents and obtain the information you need quickly and efficiently.
 
@@ -27,7 +37,7 @@ Data Processing
 - python-pptx: For working with PowerPoint presentations.
 
 
-### Setting up the project
+### Setting up the project in your system
 
 Preferred Python version: Python 3.9.13 (available to download at https://www.python.org/downloads/release/python-3913/)                                
 
@@ -86,5 +96,4 @@ This will open the Streamlit app in your web browser, typically at http://localh
 ### Usage
 - Upload your documents or add URLs to process.
 - Ask questions about the content, and get responses along with their sources.
-
 
