@@ -33,7 +33,7 @@ Preferred Python version: Python 3.9.13 (available to download at https://www.py
 
 Clone the Repository: Open your terminal. Run the following command to clone the repository 
 ```
-git clone https://github.com/yourusername/your-repo-name.git
+git clone https://github.com/AarushSharmaa/DocsTalk.git
 ```
 
 Navigate to the project directory:
