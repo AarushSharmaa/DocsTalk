@@ -56,6 +56,7 @@ url_input = st.text_input("Enter URLs (comma-separated)")
 if st.button("Process URLs"):
     urls = [url.strip() for url in url_input.split(',') if url.strip()]
     if urls:
+        st.session_state['documents_uploaded'] = True  # Set state to true when URLs are passed
         response = requests.post('http://localhost:5000/process_urls', json={'urls': urls})
         if response.status_code == 200:
             st.success("All URLs processed successfully!")
