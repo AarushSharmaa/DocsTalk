@@ -21,16 +21,12 @@ from pptx import Presentation
 import fitz  # PyMuPDF for PDF processing
 from dotenv import load_dotenv
 import logging
-from flask_cors import CORS  # Import CORS
-
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
-
 load_dotenv()
 
 # Load environment variables
@@ -202,10 +198,10 @@ def ask_question():
 
     response = llm.invoke(prompt)
     logger.info("Question processed and answer generated.")
-    return jsonify({"answer": str(response.content)}), 200
+    # Return both the answer and the sources
+    return jsonify({"answer": str(response.content), "sources": sources}), 200
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-
+    app.run(debug=True)
 
