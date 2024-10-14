@@ -21,12 +21,16 @@ from pptx import Presentation
 import fitz  # PyMuPDF for PDF processing
 from dotenv import load_dotenv
 import logging
+from flask_cors import CORS  # Import CORS
+
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
+
 load_dotenv()
 
 # Load environment variables
@@ -202,5 +206,6 @@ def ask_question():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
+
 
