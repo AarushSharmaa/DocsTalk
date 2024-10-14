@@ -56,7 +56,7 @@ url_input = st.text_input("Enter URLs (comma-separated)")
 if st.button("Process URLs"):
     urls = [url.strip() for url in url_input.split(',') if url.strip()]
     if urls:
-        st.session_state['documents_uploaded'] = True  # Set state to true when URLs are passed
+        st.session_state['documents_uploaded'] = True  # Set state to true when URLs are uploaded
         response = requests.post('http://localhost:5000/process_urls', json={'urls': urls})
         if response.status_code == 200:
             st.success("All URLs processed successfully!")
@@ -77,10 +77,16 @@ if st.button("Get Answer"):
         response = requests.post('http://localhost:5000/ask', json={'question': question})
         if response.status_code == 200:
             answer = response.json()['answer']
+            sources = response.json().get('sources', [])  # Get the sources from the response
             st.write("Answer:", answer)
+            if sources:
+                st.write("Sources:")
+                for source in sources:
+                    st.write(f"- {source}")  # Display each source
         else:
             error_message = response.json().get('error', 'Error getting answer.')
             st.error(error_message)
     else:
         st.warning("Please enter a question.")
+
 
