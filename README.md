@@ -14,6 +14,7 @@ Welcome to DocsTalk! We often find ourselves overwhelmed with information contai
 Backend
 - Flask: for API development
 - FAISS: Facebook AI Similarity Search for efficient similarity search
+- Model: gpt-4o
 
 Frontend 
 - Streamlit: for UI development
