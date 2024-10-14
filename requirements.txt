@@ -9,4 +9,4 @@ bs4~=0.0.2
 python-dotenv~=1.0.1
 docx~=0.2.4
 fitz~=0.0.1.dev2
-faiss
+faiss-cpu
