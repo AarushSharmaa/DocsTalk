@@ -10,3 +10,4 @@ python-dotenv~=1.0.1
 docx~=0.2.4
 fitz~=0.0.1.dev2
 faiss-cpu
+flask-cors
