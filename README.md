@@ -10,7 +10,7 @@ DocsTalk is an innovative application that allows you to converse with your docu
 - Features
 - Tech Stack (Backend, Frontend, Data Processing)
 - Setting up the project in your system
-- Usage
+- Steps to Test the System
 
 ### Introduction
 Welcome to DocsTalk! We often find ourselves overwhelmed with information contained in PDFs, PowerPoint presentations, text documents, and more. Traditional methods of studying and synthesizing this content can be time-consuming and inefficient. DocsTalk aims to change that by leveraging the power of LLMs, making it easy to interact with your documents and obtain the information you need quickly and efficiently.
@@ -93,7 +93,35 @@ streamlit run app.py
 This will open the Streamlit app in your web browser, typically at http://localhost:8501. You can now use the application.
 
 
-### Usage
-- Upload your documents or add URLs to process.
-- Ask questions about the content, and get responses along with their sources.
+### Steps to Test the System
+Setup Verification:
 
+- Ensure that the project is set up correctly by following the installation instructions above. This includes cloning the repository, setting up the virtual environment, and installing the required dependencies.
+- Check the terminal output to confirm that the server is running without errors and is accessible at http://localhost:5000.
+-  The Streamlit app should open in your default web browser, typically at http://localhost:8501.
+  
+Test Document Upload:
+
+- In the Streamlit interface, use the file uploader to upload various document formats (e.g., PDF, DOCX, PPTX, TXT).
+- Confirm that the application processes the uploads correctly and displays success messages.
+  
+Test URL Processing:
+
+- Enter a few URLs (up to 5) into the URL input field.
+- Click the "Process URLs" button and ensure that the application retrieves and processes the content from the provided URLs.
+  
+Ask Questions:
+
+- After uploading documents or processing URLs, enter a question in the "Ask a Question" section.
+- Check that the application retrieves a relevant answer and displays it correctly.
+  
+Review Console and Logs:
+
+- Monitor the terminal running the Flask API for any error logs or warnings during your interactions with the app to ensure that there are no underlying issues.
+  
+Functionality Testing:
+
+Test various edge cases, such as:
+- Uploading large files.
+- Entering URLs that return no content or invalid URLs.
+- Asking questions without prior uploads.
