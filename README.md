@@ -74,7 +74,7 @@ pip install -r requirements.txt
 
 Note: If you encounter dependency issues, you may need to manually install specific versions as indicated in the error messages.
 
-#### Add Environment Variables (please contact me at aarush.sharma6@gmail.com for needing the environment keys)
+#### Add Environment Variables 
 - Create a .env file in the root of your project directory and add the necessary environment variables.
 
 #### Running the Application
