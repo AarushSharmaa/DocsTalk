@@ -1,0 +1,185 @@
+### summary of the code below ###
+## checking the pre-processing of each data type, and integration with LLM at console side before moving the application to full stack ##
+## a separate function for pre-processing of each of the data type ##
+
+import requests
+from bs4 import BeautifulSoup
+from langchain.schema import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+import os
+import faiss
+import numpy as np
+from langchain_openai import AzureOpenAIEmbeddings
+from langchain_openai import AzureChatOpenAI
+import pandas as pd
+from docx import Document as DocxDocument
+from pptx import Presentation
+import fitz  # PyMuPDF for PDF processing
+
+
+# Set up Azure OpenAI configuration
+os.environ["OPENAI_API_VERSION"] = ""
+os.environ["AZURE_OPENAI_API_KEY"] = ""
+os.environ["AZURE_OPENAI_ENDPOINT"] = ""
+# Initialize the LLM (Large Language Model)
+llm = AzureChatOpenAI(
+    openai_api_version="",
+    azure_deployment="",
+    model_name="",
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+    temperature=0.0
+)
+
+# # Set up Azure OpenAI configuration
+os.environ["AZURE_OPENAI_API_KEY"] = ""
+os.environ["AZURE_OPENAI_ENDPOINT"] = ""
+os.environ["AZURE_OPENAI_API_VERSION"] = ""
+
+# Initialize embeddings
+embeddings = AzureOpenAIEmbeddings(
+    azure_deployment="",
+    openai_api_version=""
+)
+
+
+def process_pdf_file(file_path, chunk_size=1000, chunk_overlap=200):
+    doc = fitz.open(file_path)
+    concatenated_content = ""
+    for page in doc:
+        concatenated_content += page.get_text()
+    doc.close()
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    chunks = text_splitter.split_text(concatenated_content)
+    documents = [Document(page_content=chunk, metadata={"source": file_path}) for chunk in chunks]
+    return documents
+
+def process_web_links(urls, chunk_size=1000, chunk_overlap=200):
+    concatenated_content = ""
+    for url in urls:
+        response = requests.get(url, verify=False)
+        if response.status_code == 200:
+            html_content = response.text
+            soup = BeautifulSoup(html_content, 'html.parser')
+            text_content = soup.get_text()
+            concatenated_content += text_content
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    chunks = text_splitter.split_text(concatenated_content)
+    documents = [Document(page_content=chunk, metadata={"source": url}) for chunk in chunks]
+    return documents
+
+def process_text_file(file_path, chunk_size=1000, chunk_overlap=200):
+    concatenated_content = ""
+    with open(file_path, 'r', encoding='utf-8') as file:
+        concatenated_content = file.read()
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    chunks = text_splitter.split_text(concatenated_content)
+    documents = [Document(page_content=chunk, metadata={"source": file_path}) for chunk in chunks]
+    return documents
+
+def process_excel_file(file_path, chunk_size=1000, chunk_overlap=200):
+    df = pd.read_excel(file_path)
+    concatenated_content = df.to_string(index=False)
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    chunks = text_splitter.split_text(concatenated_content)
+    documents = [Document(page_content=chunk, metadata={"source": file_path}) for chunk in chunks]
+    return documents
+
+def process_word_file(file_path, chunk_size=1000, chunk_overlap=200):
+    doc = DocxDocument(file_path)
+    concatenated_content = "\n".join([para.text for para in doc.paragraphs if para.text])
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    chunks = text_splitter.split_text(concatenated_content)
+    documents = [Document(page_content=chunk, metadata={"source": file_path}) for chunk in chunks]
+    return documents
+
+def process_ppt_file(file_path, chunk_size=1000, chunk_overlap=200):
+    prs = Presentation(file_path)
+    concatenated_content = ""
+    for slide in prs.slides:
+        for shape in slide.shapes:
+            if hasattr(shape, "text") and shape.text:
+                concatenated_content += shape.text + "\n"
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    chunks = text_splitter.split_text(concatenated_content)
+    documents = [Document(page_content=chunk, metadata={"source": file_path}) for chunk in chunks]
+    return documents
+
+def create_embeddings(documents):
+    embeddings_list = embeddings.embed_documents([doc.page_content for doc in documents])
+    print("Embeddings created")
+    return np.array(embeddings_list)
+
+def ask_question(question, context, relevant_docs):
+    sources = [doc.metadata["source"] for doc in relevant_docs]
+    prompt = (
+        "You are a knowledgeable assistant. Use the context below to answer the question accurately.\n"
+        "Context:\n"
+        f"{context}\n\n"
+        f"Question: {question}\n"
+        "Answer:\n"
+        f"Sources: {', '.join(sources)}"
+    )
+    response = llm.invoke(prompt)
+    return str(response.content)
+
+def main():
+    urls_input = input("Enter URLs separated by commas: ")
+    urls = [url.strip() for url in urls_input.split(',')] if urls_input else []
+    file_path = input("Enter the path to a text file (or leave blank to skip): ")
+    excel_file_path = input("Enter the path to an Excel file (or leave blank to skip): ")
+    word_file_path = input("Enter the path to a Word file (or leave blank to skip): ")
+    ppt_file_path = input("Enter the path to a PowerPoint file (or leave blank to skip): ")
+    pdf_file_path = input("Enter the path to a PDF file (or leave blank to skip): ")
+
+
+    documents = []
+    if urls:
+        documents.extend(process_web_links(urls))
+        print(f"Processed {len(documents)} chunks from the provided URLs.")
+    if file_path:
+        documents.extend(process_text_file(file_path))
+        print(f"Processed {len(documents)} chunks from the provided text file.")
+    if excel_file_path:
+        documents.extend(process_excel_file(excel_file_path))
+        print(f"Processed {len(documents)} chunks from the provided Excel file.")
+    if word_file_path:
+        documents.extend(process_word_file(word_file_path))
+        print(f"Processed {len(documents)} chunks from the provided Word file.")
+    if ppt_file_path:
+        documents.extend(process_ppt_file(ppt_file_path))
+        print(f"Processed {len(documents)} chunks from the provided PowerPoint file.")
+
+    if pdf_file_path:
+        documents.extend(process_pdf_file(pdf_file_path))
+        print(f"Processed {len(documents)} chunks from the provided PDF file.")
+
+    if documents:
+        embeddings_matrix = create_embeddings(documents)
+        embedding_dimension = embeddings_matrix.shape[1]
+        faiss_index = faiss.IndexFlatL2(embedding_dimension)
+        faiss_index.add(embeddings_matrix)
+
+    while True:
+        question = input("Ask a question about the content (or type 'exit' to quit): ")
+        if question.lower() == 'exit':
+            print("Goodbye!")
+            break
+
+        question_embedding = embeddings.embed_query(question)
+        question_embedding = np.array([question_embedding])
+
+        distances, indices = faiss_index.search(question_embedding, k=5)
+        relevant_docs = [documents[i] for i in indices[0]]
+
+        context = " ".join([doc.page_content for doc in relevant_docs])
+        answer = ask_question(question, context, relevant_docs)
+        print(f"Answer: {answer}")
+
+if __name__ == '__main__':
+    main()
