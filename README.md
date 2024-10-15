@@ -51,7 +51,7 @@ Navigate to the project directory:
 cd DocsTalk
 ```
 
-Set Up Virtual Environment
+Set Up Virtual Environment (optional but recommended)
 - Create a virtual environment:
 ```
 python -m venv venv
